@@ -10,9 +10,15 @@ create table private.admin_users (
 alter table private.admin_users enable row level security;
 revoke all on private.admin_users from public, anon, authenticated;
 
-create or replace function public.is_admin() returns boolean
+grant usage on schema private to anon, authenticated;
+create or replace function private.is_admin() returns boolean
 language sql stable security definer set search_path = ''
 as $$ select exists(select 1 from private.admin_users where user_id = (select auth.uid()) and active); $$;
+revoke all on function private.is_admin() from public;
+grant execute on function private.is_admin() to anon, authenticated;
+create or replace function public.is_admin() returns boolean
+language sql stable security invoker set search_path = ''
+as $$ select private.is_admin(); $$;
 revoke all on function public.is_admin() from public;
 grant execute on function public.is_admin() to anon, authenticated;
 

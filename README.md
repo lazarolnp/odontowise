@@ -5,8 +5,8 @@ React + TypeScript + Vite + Tailwind CSS, com Supabase para banco, autenticaçã
 ## Estado desta entrega
 
 - Implementados: início, catálogo com busca/filtros/ordenação, detalhes, prévias, checkout individual externo, login e painel administrativo com CRUD de produtos, disciplinas, categorias, identidade e contatos.
-- Implementados no código: upload privado de originais, mídia pública separada, transação de cadastro, RLS e lista de administradores fora da API pública.
-- Não ativados automaticamente: projeto Supabase, primeiro administrador, produtos, meios de contato e entrega no checkout. Sem essas configurações, a loja funciona como prévia explicitamente identificada, sem vendas ou login falsos.
+- Implementados no código: upload privado de originais, mídia pública separada, transação de cadastro, RLS e lista de administradores fora da API pública. O verificador privilegiado fica no schema privado, com uma função pública sem privilégios elevados para a interface.
+- Banco Supabase ativado no projeto `hvzyflgatqlvkktlcsne`, com estrutura, permissões, 17 disciplinas e armazenamento privado de originais. As variáveis públicas de integração são configuradas na hospedagem, sem segredos no repositório. Primeiro administrador, produtos reais, contatos e entrega no checkout ainda precisam ser definidos.
 - Webhooks: apenas estrutura reservada de eventos e função desabilitada (HTTP 503). Nenhum pagamento é aceito como confirmado pelo site.
 - Área do cliente, cupons, avaliações, afiliados, pacotes e outros formatos não foram implementados.
 
