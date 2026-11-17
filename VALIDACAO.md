@@ -22,8 +22,8 @@
 - Compra, aprovação, entrega e reembolso precisam de configuração e teste no checkout externo.
 - Contatos e materiais reais ainda precisam ser cadastrados.
 - Webhook continua desabilitado (HTTP 503), sem confirmação de pagamentos.
-- A revisão visual no navegador integrado ainda não foi concluída; houve uma falha de sessão durante a tentativa anterior.
+- Revisão visual concluída em 390 × 844 e 1280 × 900. Testados navegação inicial, busca, filtro por disciplina, catálogo vazio, exemplos identificados, página demonstrativa com compra desabilitada e login privado. O console não registrou erros durante esses testes.
 
 ## Hospedagem
 
-O projeto Vercel Dentwise usa Node 22, `npm ci`, `npm run build && npm test`, saída `dist` e as duas variáveis públicas de integração com o Supabase. O estado de cada implantação deve ser conferido na Vercel. Não há chaves privadas no frontend.
+O projeto Vercel Dentwise usa Node 22, `npm ci`, `npm run build && npm test`, saída `dist` e as duas variáveis públicas de integração com o Supabase. Implantação verificada como READY no commit `192f0e724b9241db8f5d680f42ae850a14e07bd1`. Endereço: https://dentwise-beryl.vercel.app/. Inicial, catálogo e administração responderam HTTP 200. O estado de cada implantação posterior deve ser conferido na Vercel. Não há chaves privadas no frontend.
