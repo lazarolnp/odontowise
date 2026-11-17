@@ -1,6 +1,6 @@
 # Dentwise — loja digital de materiais acadêmicos
 
-React + TypeScript + Vite + Tailwind CSS, com Supabase para banco, autenticação e armazenamento. Compatível com Vercel. Identidade Dentwise fornecida pelo proprietário. A logo original está em `public/brand/dentwise-original.jpeg`, preservada sem alteração dos bytes; apenas as margens vazias são enquadradas na interface.
+React + TypeScript + Vite + Tailwind CSS, com Supabase para banco, autenticação e armazenamento. Compatível com Vercel. Identidade Dentwise fornecida pelo proprietário. O arquivo original permanece em `public/brand/dentwise-original.jpeg`. A interface usa `public/brand/dentwise-transparent.png`, versão com fundo transparente solicitada pelo proprietário, mantendo o desenho da marca.
 
 ## Estado desta entrega
 
@@ -70,3 +70,7 @@ Não há dependência de APIs proprietárias de hospedagem no aplicativo. O cód
 Categorias são o tipo comercial do material; disciplinas são a organização acadêmica. Novos formatos podem usar novas categorias e evoluir o modelo quando aprovados. Não são prometidas funcionalidades futuras no fluxo atual.
 
 Referências técnicas: https://supabase.com/docs/guides/database/postgres/row-level-security e https://supabase.com/docs/guides/storage/buckets/fundamentals.
+
+## Comunicação e próximos formatos
+
+A vitrine destaca a escolha e a compra de resumos, com conteúdos e prévias antes do checkout. Não utiliza depoimentos, escassez, preços ou materiais fictícios. Flashcards, mapas mentais e outros formatos poderão ser organizados pelas categorias editáveis quando houver materiais reais; esta alteração não ativa esses produtos nem implementa estudo interativo.

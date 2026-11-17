@@ -3,7 +3,7 @@
 ## Código e marca
 
 - TypeScript, build de produção e os quatro testes automatizados passaram.
-- Logo original aplicada sem alteração dos bytes, com comparação SHA-256.
+- Arquivo original da logo preservado. Aplicada versão PNG com transparência real (canal alpha), conforme solicitação posterior do proprietário.
 - Código enviado ao repositório público autorizado pelo proprietário.
 
 ## Supabase real
@@ -27,3 +27,7 @@
 ## Hospedagem
 
 O projeto Vercel Dentwise usa Node 22, `npm ci`, `npm run build && npm test`, saída `dist` e as duas variáveis públicas de integração com o Supabase. Implantação verificada como READY no commit `192f0e724b9241db8f5d680f42ae850a14e07bd1`. Endereço: https://dentwise-beryl.vercel.app/. Inicial, catálogo e administração responderam HTTP 200. O estado de cada implantação posterior deve ser conferido na Vercel. Não há chaves privadas no frontend.
+
+## Atualização da vitrine
+
+Frase editorial substituída por “Seu próximo resumo. Mais foco para estudar.”, chamadas de compra destacadas e comunicação orientada à escolha de materiais. O catálogo real permanece sem produtos demonstrativos no banco. Build de produção aprovado após os ajustes.
