@@ -1,0 +1,6 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { parsePrice, safeHttps, validateFile } from '../src/lib/validation.ts';
+test('prices preserve cents and reject malformed input',()=>{assert.equal(parsePrice('19,90'),1990);assert.equal(parsePrice('19.90'),1990);assert.equal(parsePrice('25'),2500);for(const v of ['19,999','1.234,00','-5','abc','Infinity',''])assert.ok(Number.isNaN(parsePrice(v)));});
+test('checkout URLs cannot execute scripts or carry embedded credentials',()=>{assert.ok(safeHttps('https://pay.example.com/product'));for(const u of ['javascript:alert(1)','http://pay.example.com','https://admin:pass@example.com','https://localhost/x','https://127.0.0.1/x','/checkout'])assert.equal(safeHttps(u),false);});
+test('original PDFs and public image uploads validate signatures and size',async()=>{await validateFile(new File(['%PDF-1.7\n'], 'original.pdf',{type:'application/pdf'}),'pdf');await assert.rejects(validateFile(new File(['<svg/>'],'wrong.pdf',{type:'application/pdf'}),'pdf'));await assert.rejects(validateFile(new File(['<svg/>'],'logo.svg',{type:'image/svg+xml'}),'image'));await assert.rejects(validateFile(new File([new Uint8Array(5242881)],'big.png',{type:'image/png'}),'image'));});

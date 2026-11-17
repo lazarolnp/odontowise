@@ -1,0 +1,23 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { PGlite } from '@electric-sql/pglite';
+test('PostgreSQL policies isolate PDFs and enforce administrator publication',async()=>{
+ const db=new PGlite();
+ await db.exec(`create role anon; create role authenticated; create schema auth; create table auth.users(id uuid primary key); create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$; grant usage on schema auth to anon,authenticated; grant execute on function auth.uid() to anon,authenticated; create schema storage; create table storage.buckets(id text primary key,name text,public boolean,file_size_limit bigint,allowed_mime_types text[]); create table storage.objects(id uuid default gen_random_uuid(),bucket_id text,name text); alter table storage.objects enable row level security; grant usage on schema public,storage to anon,authenticated; grant select,insert,update,delete on storage.objects to anon,authenticated;`);
+ await db.exec(await readFile(new URL('../supabase/migrations/202611170001_store.sql',import.meta.url),'utf8'));
+ const admin='00000000-0000-4000-8000-000000000001',visitor='00000000-0000-4000-8000-000000000002',product='00000000-0000-4000-8000-000000000003';
+ await db.exec(`insert into auth.users values('${admin}'),('${visitor}');insert into private.admin_users(user_id) values('${admin}');insert into storage.objects(bucket_id,name) values('original-pdfs','secret.pdf'),('public-media','cover.jpg');`);
+ const disciplines=await db.query<{id:string}>('select id from public.disciplines limit 1');const categories=await db.query<{id:string}>('select id from public.categories limit 1');
+ const payload={name:'Material de teste automatizado',description:'Descrição restrita ao teste de segurança do banco.',course:'Odontologia',discipline_id:disciplines.rows[0].id,category_id:categories.rows[0].id,price_cents:1990,cover_path:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.png',preview_paths:[],contents:['Assunto de teste'],checkout_url:'https://checkout.example.com/product',status:'published',featured:true,is_new:true};
+ await db.exec(`set role anon;`);assert.deepEqual((await db.query('select name from storage.objects')).rows,[{name:'cover.jpg'}]);await assert.rejects(db.query('select * from public.product_files'));await assert.rejects(db.query('select * from private.admin_users'));assert.equal((await db.query<{is_admin:boolean}>('select public.is_admin()')).rows[0].is_admin,false);
+ await db.exec(`reset role;set role authenticated;set request.jwt.claim.sub='${visitor}';`);await assert.rejects(db.query('select public.save_product($1,$2::jsonb,$3)',[product,JSON.stringify(payload),'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.pdf']));assert.equal((await db.query('select * from public.product_files')).rows.length,0);await assert.rejects(db.exec("insert into storage.objects(bucket_id,name) values('original-pdfs','attacker.pdf')"));
+ await db.exec(`set request.jwt.claim.sub='${admin}';`);assert.equal((await db.query<{is_admin:boolean}>('select public.is_admin()')).rows[0].is_admin,true);
+ // A failed publication rolls back metadata and does not leave a public draft.
+ await assert.rejects(db.query('select public.save_product($1,$2::jsonb,$3)',[product,JSON.stringify(payload),null]));assert.equal((await db.query('select * from public.products')).rows.length,0);
+ await db.query('select public.save_product($1,$2::jsonb,$3)',[product,JSON.stringify(payload),'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.pdf']);assert.equal((await db.query('select * from public.product_files')).rows.length,1);await assert.rejects(db.query('update public.disciplines set active=false where id=$1',[payload.discipline_id]));
+ await db.exec(`reset role;set role anon;set request.jwt.claim.sub='';`);const publicProduct=(await db.query<Record<string,unknown>>('select * from public.products')).rows[0];assert.equal(publicProduct.id,product);assert.ok(!('pdf_path' in publicProduct));assert.equal((await db.query('select * from storage.objects')).rows.length,1);
+ await db.exec(`reset role;set role authenticated;set request.jwt.claim.sub='${visitor}';`);await db.query("update public.products set name='Unauthorized change' where id=$1",[product]);assert.equal((await db.query<{name:string}>('select name from public.products')).rows[0].name,payload.name);
+ await db.exec(`set request.jwt.claim.sub='${admin}';`);await db.query("update public.products set status='inactive' where id=$1",[product]);await db.exec(`reset role;set role anon;set request.jwt.claim.sub='';`);assert.equal((await db.query('select * from public.products')).rows.length,0);
+ await db.close();
+});
